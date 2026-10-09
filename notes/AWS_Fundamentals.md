@@ -133,24 +133,419 @@ Steps:
 
 ---
 
+
 # 7. IAM Policies
 
-An IAM policy defines permissions.
-
-A policy determines which AWS actions are allowed or denied on which resources.
+An IAM policy defines permissions in AWS. It determines which actions are allowed or denied on specific AWS resources.
 
 Policies are commonly written as JSON documents.
 
-Example structure:
+## Basic IAM Policy Structure
 
-```json
+Example policy allowing a user to list objects in one specific S3 bucket. Replace `example-bucket-name` with the actual bucket name before using it.
+
+```
 {
     "Version": "2012-10-17",
     "Statement": [
         {
             "Effect": "Allow",
-            "Action": "service:Action",
-            "Resource": "*"
+            "Action": "s3:ListBucket",
+            "Resource": "arn:aws:s3:::example-bucket-name"
         }
     ]
 }
+```
+
+### Important Policy Elements
+
+* **Version** — Specifies the policy language version.
+* **Effect** — Specifies whether the permission is `Allow` or `Deny`.
+* **Action** — Specifies the AWS action.
+* **Resource** — Specifies the AWS resource to which the permission applies.
+* **Condition** — Adds conditions under which the permission applies.
+
+### Types of IAM Policies
+
+* **AWS managed policies** — Created and maintained by AWS.
+* **Customer managed policies** — Created and managed by the customer.
+* **Inline policies** — Directly attached to an individual user, group, or role.
+
+### Important Note
+
+An explicit `Deny` overrides an `Allow`. Access is granted only when the applicable policies permit the requested action and no explicit deny applies.
+
+---
+
+# 8. IAM Roles
+
+An IAM role is an identity with permissions that can be assumed by a trusted user, AWS service, or other authorized entity.
+
+Unlike a typical IAM user's long-term credentials, a role provides temporary security credentials when assumed.
+
+### Common Uses
+
+* Allowing an EC2 instance to access S3.
+* Allowing Lambda to access other AWS services.
+* Granting temporary access to users or applications.
+* Enabling access between AWS accounts.
+
+### IAM Role vs IAM User
+
+| IAM User                                    | IAM Role                                                  |
+| ------------------------------------------- | --------------------------------------------------------- |
+| Represents a person or application identity | Provides permissions that an authorized entity can assume |
+| May have console credentials or access keys | Uses temporary credentials when assumed                   |
+| Credentials may be long-term                | Role credentials are temporary                            |
+| Suitable for specific identity needs        | Useful for AWS services and delegated access              |
+
+**Best practice:** Prefer IAM roles and temporary credentials over storing long-term access keys in applications.
+
+---
+
+# 9. Principle of Least Privilege
+
+The principle of least privilege means granting only the permissions necessary to perform a particular task.
+
+### Example
+
+If an application only needs to read files from an S3 bucket, it should not automatically receive permission to delete files or change bucket settings.
+
+### Benefits
+
+* Reduces unauthorized access.
+* Limits the impact of compromised credentials.
+* Improves security and permission management.
+* Helps prevent accidental changes to resources.
+
+### Best Practices
+
+* Grant only the required actions.
+* Restrict permissions to specific resources whenever possible.
+* Avoid broad permissions such as `Action: "*"` and `Resource: "*"`, unless genuinely required.
+* Review permissions regularly.
+* Remove permissions that are no longer needed.
+
+---
+
+# 10. IAM Identity Center
+
+AWS IAM Identity Center helps manage workforce access to AWS accounts and supported applications from a central location.
+
+It supports centralized sign-in and permission assignment.
+
+### Important Concepts
+
+* **Identity source** — Where user identities are managed, such as the Identity Center directory or an external identity provider.
+* **Users and groups** — Identities that can be organized and managed centrally.
+* **Permission sets** — Define the permissions users or groups receive when accessing AWS accounts.
+* **Access portal** — A central portal through which assigned users can access available AWS accounts and applications.
+
+### Benefits
+
+* Centralized access management.
+* Simplified sign-in across supported AWS accounts.
+* Easier permission assignment.
+* Better control over workforce access.
+
+### IAM vs IAM Identity Center
+
+IAM manages identities and permissions within an AWS account, including users, roles, and policies. IAM Identity Center is designed to simplify workforce access across multiple AWS accounts and supported applications.
+
+---
+
+# 11. AWS Organizations
+
+AWS Organizations allows multiple AWS accounts to be managed centrally.
+
+### Important Concepts
+
+* **Management account** — The account used to manage the organization.
+* **Member accounts** — Accounts added to the organization.
+* **Organizational units (OUs)** — Groups of accounts arranged for easier management.
+* **Service Control Policies (SCPs)** — Set permission guardrails for accounts or OUs. SCPs do not grant permissions by themselves.
+
+### Benefits
+
+* Centralized account management.
+* Consolidated billing.
+* Applying permission guardrails.
+* Organizing accounts by department, project, or environment.
+
+### Example
+
+A company may separate development, testing, and production workloads into different AWS accounts and manage them through AWS Organizations.
+
+---
+
+# 12. AWS Access Keys
+
+Access keys allow programmatic access to AWS through tools such as the AWS CLI and SDKs.
+
+An access key consists of an access key ID and a secret access key.
+
+### Security Best Practices
+
+* Never publish access keys on GitHub.
+* Never hardcode secret keys in application code.
+* Do not share credentials with other people.
+* Prefer IAM roles or other supported temporary credentials where possible.
+* Rotate or deactivate credentials when necessary.
+* Remove unused access keys.
+
+**Important:** An access key ID is not the secret itself, but it should still be handled carefully. The secret access key must be protected.
+
+---
+
+# 13. AWS Command Line Interface (AWS CLI)
+
+The AWS CLI is a tool for managing AWS services from a terminal.
+
+It allows users to perform many AWS operations without using the web console.
+
+### Common Commands
+
+Check the installed AWS CLI version:
+
+```
+aws --version
+```
+
+Check the identity associated with the current credentials:
+
+```
+aws sts get-caller-identity
+```
+
+List S3 buckets accessible to the current identity:
+
+```
+aws s3 ls
+```
+
+List EC2 instances in the configured Region:
+
+```
+aws ec2 describe-instances
+```
+
+### Important Notes
+
+* AWS CLI commands require appropriate authentication and permissions.
+* Commands operate in a configured or explicitly specified Region when the service is regional.
+* Avoid entering secret access keys directly into commands or committing credential files to GitHub.
+* The commands above work only when the CLI is installed, configured, and authorized for the requested operation.
+
+---
+
+# 14. AWS Global Infrastructure
+
+AWS operates a global infrastructure that supports applications and services around the world.
+
+### Regions
+
+A Region is a separate geographic area containing multiple Availability Zones.
+
+Regions help users select where resources and data will be hosted.
+
+### Availability Zones
+
+An Availability Zone (AZ) consists of one or more discrete data centers with independent infrastructure.
+
+Deploying across multiple AZs can improve availability and resilience.
+
+### Edge Locations
+
+Edge locations are used by services such as Amazon CloudFront to deliver content with lower latency by bringing it closer to users.
+
+### Choosing a Region
+
+Consider:
+
+* Latency for users.
+* Service availability in the Region.
+* Data residency and compliance requirements.
+* Cost differences.
+* Disaster recovery requirements.
+
+---
+
+# 15. AWS Shared Responsibility Model
+
+The Shared Responsibility Model divides security responsibilities between AWS and the customer.
+
+### AWS Responsibility — Security of the Cloud
+
+AWS is responsible for protecting the infrastructure that runs AWS services, including the underlying physical facilities, hardware, and foundational infrastructure.
+
+### Customer Responsibility — Security in the Cloud
+
+Customers are responsible for securing what they configure and deploy in AWS. The exact responsibilities depend on the service used.
+
+Examples include:
+
+* Managing IAM permissions.
+* Protecting credentials.
+* Configuring network access.
+* Securing application code and data.
+* Configuring encryption and logging where required.
+* Managing operating system updates on EC2 instances.
+
+### Example
+
+For an EC2 virtual machine, AWS manages the underlying physical infrastructure, while the customer is responsible for tasks such as guest operating system updates, instance access, and application security.
+
+For a managed service, AWS may handle more of the underlying operational work, but customer responsibilities still remain.
+
+---
+
+# 16. AWS APIs and SDKs
+
+An API (Application Programming Interface) allows software applications to communicate with a service.
+
+AWS services provide APIs that allow users and applications to create, manage, and access AWS resources.
+
+### AWS SDKs
+
+AWS Software Development Kits provide libraries that help developers interact with AWS services from programming languages such as Python, JavaScript, and Java.
+
+### Example
+
+A Python application can use the AWS SDK for Python, called **Boto3**, to interact with services such as S3 and EC2.
+
+### Benefits
+
+* Automating repetitive tasks.
+* Integrating AWS services into applications.
+* Managing resources programmatically.
+* Building cloud-based applications.
+
+---
+
+# 17. AWS Pricing Fundamentals
+
+AWS pricing depends on the service, configuration, Region, usage, and applicable pricing model.
+
+Many services use pay-as-you-go pricing, but not every resource is billed in the same way.
+
+### Common Cost Factors
+
+* Compute usage.
+* Storage capacity.
+* Data transfer.
+* Requests and API operations.
+* Database capacity and usage.
+* Networking resources.
+* Support plans and optional features.
+
+### Important EC2 Cost Considerations
+
+EC2 costs may depend on the instance type, operating system, Region, purchasing option, and running duration.
+
+Stopping an EC2 instance generally stops its instance compute charges, but associated resources such as EBS volumes and certain public IPv4 addresses may still incur charges.
+
+### Important S3 Cost Considerations
+
+S3 charges can depend on storage volume, storage class, requests, data retrieval, replication, and data transfer.
+
+### Best Practices
+
+* Select resources based on actual requirements.
+* Stop or delete unused resources.
+* Review service pricing before creating resources.
+* Monitor usage and billing.
+* Check whether a service or configuration is eligible for any applicable Free Tier offer.
+
+---
+
+# 18. AWS Cost Management Tools
+
+AWS provides tools to help users understand and manage cloud expenditure.
+
+### AWS Billing and Cost Management
+
+Provides access to billing information, invoices, and cost-management features.
+
+### AWS Budgets
+
+Allows users to create budgets and configure alerts when actual or forecasted spending reaches defined thresholds.
+
+A budget alert helps notify users about costs; it does not automatically stop every resource.
+
+### AWS Cost Explorer
+
+Helps analyze historical costs and usage by service, Region, and other dimensions.
+
+### AWS Pricing Calculator
+
+Helps estimate the expected cost of an AWS architecture before deploying it.
+
+### Cost Optimization Practices
+
+* Review billing dashboards regularly.
+* Set budgets and alerts.
+* Remove unused resources.
+* Select appropriate storage classes.
+* Right-size compute resources.
+* Review data transfer and networking costs.
+
+---
+
+# 19. Six Advantages of Cloud Computing
+
+The commonly taught advantages of cloud computing include:
+
+1. **Trade capital expense for variable expense** — Pay for resources according to usage rather than buying all infrastructure upfront.
+2. **Benefit from massive economies of scale** — Cloud providers can achieve efficiencies through large-scale operations.
+3. **Stop guessing capacity** — Adjust resources according to demand.
+4. **Increase speed and agility** — Provision infrastructure quickly.
+5. **Stop spending money running and maintaining data centers** — Reduce the need to operate physical infrastructure.
+6. **Go global in minutes** — Deploy services in multiple geographic Regions when needed.
+
+---
+
+# 20. IAM and Account Security Best Practices
+
+* Enable MFA for the root user and privileged identities.
+* Avoid using the root user for everyday administration.
+* Use individual identities rather than sharing credentials.
+* Apply the principle of least privilege.
+* Prefer roles and temporary credentials where appropriate.
+* Keep access keys and passwords secret.
+* Review users, groups, roles, and policies regularly.
+* Enable relevant logging and monitoring.
+* Set up billing alerts and review costs.
+* Remove unused resources and credentials.
+
+---
+
+# 21. Practical Learning Summary
+
+The following activities were completed or explored during AWS learning:
+
+* AWS account setup and root-user security.
+* MFA setup.
+* IAM user and group creation.
+* IAM permissions and policies.
+* IAM Identity Center exploration.
+* AWS Organizations exploration.
+* EC2 and storage practice in the Compute and Storage task.
+
+Further practical details should be documented in the relevant task files rather than duplicated here.
+
+---
+
+# 22. Key Takeaways
+
+* AWS provides cloud computing services across compute, storage, networking, databases, and security.
+* The root user has extensive account permissions and should be protected.
+* MFA adds an extra layer of authentication security.
+* IAM controls access to AWS resources through identities and permissions.
+* IAM roles provide temporary credentials to authorized entities.
+* Least privilege reduces unnecessary access.
+* IAM Identity Center simplifies workforce access management.
+* AWS Organizations supports centralized management of multiple accounts.
+* AWS Regions and Availability Zones support geographic deployment and resilience.
+* The Shared Responsibility Model defines the security responsibilities of AWS and its customers.
+* AWS pricing depends on service usage and configuration.
+* Billing tools, budgets, and cost analysis help manage expenditure.
