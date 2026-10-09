@@ -670,80 +670,98 @@ It allows applications running on-premises to use AWS storage services.
 
 ## EC2 Hands-on
 
+**Status: Completed**
+
 The following EC2 activities were practiced:
 
-- Launched an EC2 instance.
-- Connected to the EC2 instance.
-- Used Amazon Linux 2023.
-- Checked network configuration using `ifconfig`.
-- Tested internet connectivity using `ping google.com`.
+* Launched an EC2 instance.
+* Connected to the instance using the available connection method.
+* Used Amazon Linux 2023.
+* Checked network configuration using `ifconfig`.
+* Verified internet connectivity using `ping google.com`.
 
 ### Network Verification
 
-Command:
+**Command:**
 
 ```bash
 ifconfig
 ```
 
-The EC2 instance displayed a private IPv4 address in the VPC.
+The instance displayed its private IPv4 address within the VPC.
 
-Command:
+**Connectivity test:**
 
 ```bash
 ping google.com
 ```
 
-The connectivity test successfully returned responses with no packet loss.
+**Observed result:** 16 packets transmitted, 16 received, with 0% packet loss.
 
-### Evidence
-
-Screenshots of the EC2 instance, connection, network configuration, and connectivity test are maintained as hands-on evidence.
+This confirmed successful connectivity to the destination during the test.
 
 ---
 
 ## EC2 User Data
 
-### Status
+**Status: Learning notes prepared**
 
-To be completed.
+EC2 User Data can run scripts during the initial launch of an instance to automate setup tasks.
 
-Planned practice:
+Example tasks include installing software, updating packages, and starting services. The script in Section 6 is an example of how this can be configured.
 
-- Launch/configure an EC2 instance using User Data.
-- Use a shell script to install and configure a service.
-- Verify that the script executed successfully.
+*Note: Only mark the hands-on execution as completed if you actually ran and verified a User Data script.*
 
 ---
 
-## IAM Role with EC2
+## IAM Roles with EC2
 
-### Status
+**Status: Concept reviewed**
 
-To be completed.
+An IAM role allows an EC2 instance to access AWS services using temporary credentials instead of storing long-term access keys on the instance.
 
-Planned practice:
+For example:
 
-- Create or use an appropriate IAM role.
-- Attach the required permissions.
-- Associate the role with an EC2 instance.
-- Test access to the required AWS service.
+```text
+EC2 Instance → IAM Role → Amazon S3
+```
+
+The role must have the appropriate permissions for the required operation.
+
+*Note: Mark the practical role-assignment and access test as completed only if you actually performed those steps.*
 
 ---
 
 ## S3 Hands-on
 
-### Status
+**Status: Completed**
 
-To be completed.
+The following S3 activities were practiced:
 
-Planned practice:
+* Created an S3 bucket.
+* Uploaded an object to the bucket.
+* Explored the S3 bucket and its contents.
 
-- Create an S3 bucket.
-- Upload objects.
-- Explore different S3 storage classes.
-- Review versioning.
-- Review lifecycle rules and replication concepts.
+### Bucket Details
+
+* **Bucket name:** `mybucket-26gloriya`
+* **AWS Region:** US East (N. Virginia) — `us-east-1`
+
+### Learning Outcome
+
+An S3 bucket stores objects such as documents, images, videos, and backups. Objects can be managed through the AWS Management Console, and storage classes can be selected according to access and cost requirements.
+
+*Note: Versioning, lifecycle rules, replication, and individual storage-class testing should be marked as completed only if you explored or configured them in the console.*
+
+---
+
+## Practical Summary
+
+The EC2 and S3 hands-on tasks were completed. The EC2 work included connecting to the instance and verifying network connectivity, while the S3 work included creating a bucket and uploading an object.
+
+The remaining concepts, including User Data and IAM roles with EC2, can be practiced separately if hands-on execution is required by the internship task sheet.
+
+
 
 ---
 
